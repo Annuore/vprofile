@@ -29,9 +29,22 @@ jobs:
             docker build -t $HUB_REPO:db .circleci/db/.
             docker build -t $HUB_REPO:web .circleci/web/.
       - run:
-          name: scan images 
+          name: scan and sign images 
           command: |
             trivy image --ignore-unfixed --format json --output scan.json $HUB_REPO:appv1
+            trivy image --ignore-unfixed --format json --output scan.json $HUB_REPO:db
+            trivy image --ignore-unfixed --format json --output scan.json $HUB_REPO:web
+            cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:appv1
+            cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:db
+            cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:web
+
+      - run: 
+          name: push images to docker repo 
+          command: |
+            docker login -u $HUB_USER -p $HUB_PASS
+            docker push $HUB_REPO:appv1
+            docker push $HUB_REPO:web
+            docker push $HUB_REPO:db
 
 workflows:
   container_hardening:
