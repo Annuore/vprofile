@@ -22,7 +22,7 @@ jobs:
       - run: 
           name: build images
           command: |
-            docker build -t $HUB_REPO:appv1 .
+            # docker build -t $HUB_REPO:appv1 
             docker build -t $HUB_REPO:db db/.
             docker build -t $HUB_REPO:web web/.
       - run:
