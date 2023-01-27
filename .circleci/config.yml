@@ -19,10 +19,13 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
+      - attach_workspace:
+          at: ~/
+      - install-trivy
       - run: 
           name: build images
           command: |
-            # docker build -t $HUB_REPO:appv1 
+            docker build -t $HUB_REPO:appv1 .circleci/Dockerfile
             docker build -t $HUB_REPO:db db/.
             docker build -t $HUB_REPO:web web/.
       - run:
