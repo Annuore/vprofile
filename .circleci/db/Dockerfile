@@ -5,5 +5,5 @@ LABEL "Author"="Imran"
 ENV MYSQL_ROOT_PASSWORD="vprodbpass"
 ENV MYSQL_DATABASE="accounts"
 
-WORKDIR /
+
 COPY db_backup.sql docker-entrypoint-initdb.d/db_backup.sql

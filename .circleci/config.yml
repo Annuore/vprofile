@@ -1,7 +1,18 @@
 version: 2.1
 
+commands:
+  install-trivy:
+    description: This command installs the trivy scanner by calling it 
+    steps:
+      - run:
+          command: |
+            sudo apt-get install wget apt-transport-https gnupg lsb-release
+            wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+            echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+            sudo apt-get update
+            sudo apt-get install trivy
 jobs:
-  build-images:
+  build-and-scan-images:
     docker:
       - image: cimg/base:2023.01
     steps:
@@ -9,6 +20,19 @@ jobs:
       - setup_remote_docker:
           docker_layer_caching: true
       - run: 
-          name: build app 
+          name: build images
           command: |
-            docker build -t
+            docker build -t $HUB_REPO:appv1 .
+            docker build -t $HUB_REPO:db db/.
+            docker build -t $HUB_REPO:web web/.
+      - run:
+          name: scan images 
+          command: |
+            trivy image --ignore-unfixed --format json --output scan.json $HUB_REPO:appv1
+
+workflows:
+  container_hardening:
+    jobs: 
+    - build-and-scan-images
+
+  
