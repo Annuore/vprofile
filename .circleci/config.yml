@@ -11,6 +11,16 @@ commands:
             echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
             sudo apt-get update
             sudo apt-get install trivy
+
+  install-cosign:
+    description: This command installs the cosign by calling it 
+    steps:
+      - run:
+          command: |
+            wget "https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64"
+            sudo mv cosign-linux-amd64 /usr/local/bin/cosign
+            sudo chmod +x /usr/local/bin/cosign
+
 jobs:
   build-and-scan-images:
     docker:
@@ -22,6 +32,7 @@ jobs:
       - attach_workspace:
           at: /
       - install-trivy
+      - install-cosign
       - run: 
           name: build images
           command: |
