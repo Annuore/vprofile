@@ -17,9 +17,9 @@ commands:
     steps:
       - run:
           command: |
-            wget "https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64"
-            sudo mv cosign-linux-amd64 /usr/local/bin/cosign
-            sudo chmod +x /usr/local/bin/cosign
+            # # wget "https://github.com/sigstore/cosign/releases/download/v1.6.0/cosign-linux-amd64"
+            # # sudo mv cosign-linux-amd64 /usr/local/bin/cosign
+            # sudo chmod +x /usr/local/bin/cosign
 
 jobs:
   build-and-scan-images:
@@ -32,7 +32,7 @@ jobs:
       - attach_workspace:
           at: /
       - install-trivy
-      - install-cosign
+      # - install-cosign
       - run: 
           name: build images
           command: |
@@ -45,9 +45,9 @@ jobs:
             trivy image --ignore-unfixed --format json --output scan.json $HUB_REPO:appv1
             trivy image --ignore-unfixed --format json --output scan.json $HUB_REPO:db
             trivy image --ignore-unfixed --format json --output scan.json $HUB_REPO:web
-            cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:appv1
-            cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:db
-            cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:web
+            # cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:appv1
+            # cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:db
+            # cosign attest --replace --predicate scan.json --type vuln  $HUB_REPO:web
 
       - run: 
           name: push images to docker repo 
